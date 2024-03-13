@@ -13,7 +13,7 @@ module Gvlwait
       @app = app
       GVLTools::LocalTimer.enable
 
-      @@scheduler.every '5s' do
+      @@scheduler.every '30s' do
         log_gvl_wait_time_data unless @@gvl_wait_times.empty?
       end
     end
@@ -40,6 +40,7 @@ module Gvlwait
       @@gvl_wait_times.clear
 
       values_to_send.each do |gvl_wait_time|
+        # TODO -- Persist this information
         puts "[Gvlwait] gvl_wait_time=#{gvl_wait_time}"
       end
     end
