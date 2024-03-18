@@ -10,9 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_18_060110) do
-  create_table "gvlwait_durations", force: :cascade do |t|
-    t.float "wait_duration", null: false
+ActiveRecord::Schema[7.1].define(version: 2024_03_18_190645) do
+  create_table "gvlwait_metrics", force: :cascade do |t|
+    t.string "request_id", null: false
+    t.float "gvl_wait_time", null: false
+    t.float "processing_time", null: false
     t.string "process_type", null: false
     t.integer "concurrency_level", null: false
     t.datetime "created_at", null: false

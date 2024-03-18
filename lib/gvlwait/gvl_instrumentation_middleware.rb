@@ -6,7 +6,7 @@ require 'concurrent'
 module Gvlwait
   class GvlInstrumentationMiddleware
     BATCH_SIZE = 100
-    @@gvl_wait_durations = Concurrent::Array.new
+    @@metrics = Concurrent::Array.new
 
     def initialize(app)
       @app = app
@@ -20,13 +20,21 @@ module Gvlwait
 
       response = @app.call(env)
 
-      gvl_wait_duration_ms = ((GVLTools::LocalTimer.monotonic_time - gvl_start_time) / 1_000_000.0).round(2)
-      total_request_duration_ms = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond) - request_start_time
+      gvl_wait_time_ms = ((GVLTools::LocalTimer.monotonic_time - gvl_start_time) / 1_000_000.0).round(2)
+      request_processing_time_ms = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond) - request_start_time
       
-      @@gvl_wait_durations << gvl_wait_duration_ms
+      metric = {
+        request_id: env["action_dispatch.request_id"],
+        process_type: "web",
+        gvl_wait_time: gvl_wait_time_ms,
+        processing_time: request_processing_time_ms,
+        concurrency_level: puma_max_threads
+      }
 
-      if @@gvl_wait_durations.size >= BATCH_SIZE
-        log_gvl_wait_duration_data
+      @@metrics << metric
+
+      if @@metrics.size >= BATCH_SIZE
+        record_request_metrics
       end
 
       response
@@ -34,11 +42,11 @@ module Gvlwait
 
     private
 
-      def log_gvl_wait_duration_data
-        values_to_send = @@gvl_wait_durations.dup
-        @@gvl_wait_durations.clear
+      def record_request_metrics
+        metrics_to_send = @@metrics.dup
+        @@metrics.clear
         
-        Gvlwait::RecordDurationsJob.perform_later(values_to_send, "web", puma_max_threads)
+        Gvlwait::RecordMetricsJob.perform_later(metrics_to_send)
       end
 
       def puma_max_threads
