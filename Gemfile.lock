@@ -5,7 +5,6 @@ PATH
       concurrent-ruby (>= 1.2.0)
       gvltools (~> 0.4.0)
       rails (>= 7.1.1)
-      rufus-scheduler (~> 3.2.0)
 
 GEM
   remote: https://rubygems.org/
@@ -173,7 +172,6 @@ GEM
       psych (>= 4.0.0)
     reline (0.4.3)
       io-console (~> 0.5)
-    rufus-scheduler (3.2.2)
     sprockets (4.2.1)
       concurrent-ruby (~> 1.0)
       rack (>= 2.2.4, < 4)

@@ -1,21 +1,16 @@
 require 'gvltools'
 require 'net/http'
 require 'uri'
-require 'rufus-scheduler'
 require 'concurrent'
 
 module Gvlwait
   class GvlInstrumentationMiddleware
+    BATCH_SIZE = 100
     @@gvl_wait_times = Concurrent::Array.new
-    @@scheduler = Rufus::Scheduler.new
 
     def initialize(app)
       @app = app
       GVLTools::LocalTimer.enable
-
-      @@scheduler.every '30s' do
-        log_gvl_wait_time_data unless @@gvl_wait_times.empty?
-      end
     end
 
     def call(env)
@@ -29,19 +24,20 @@ module Gvlwait
       
       @@gvl_wait_times << gvl_wait_duration_ms
 
+      if @@gvl_wait_times.size >= BATCH_SIZE
+        log_gvl_wait_time_data
+      end
+
       response
     end
 
     def log_gvl_wait_time_data
-      values_to_send = []
-
-      # Moving data out of the shared array
       values_to_send = @@gvl_wait_times.dup
       @@gvl_wait_times.clear
 
       values_to_send.each do |gvl_wait_time|
-        # TODO -- Persist this information
         puts "[Gvlwait] gvl_wait_time=#{gvl_wait_time}"
+        # TODO -- Persist this information
       end
     end
   end

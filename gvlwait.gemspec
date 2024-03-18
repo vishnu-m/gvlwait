@@ -15,6 +15,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "rails", ">= 7.1.1"
   spec.add_dependency "gvltools", "~> 0.4.0"
-  spec.add_dependency "rufus-scheduler", "~> 3.2.0"
   spec.add_dependency "concurrent-ruby", ">= 1.2.0"
 end
