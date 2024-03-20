@@ -50,7 +50,7 @@ module Gvlwait
       end
 
       def puma_max_threads
-        @_puma_max_threads ||= JSON.parse(Puma.stats)["max_threads"]
+        @_puma_max_threads ||= Gvlwait.configuration.puma_max_threads
       end
   end
 end
