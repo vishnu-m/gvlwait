@@ -15,9 +15,9 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_18_190645) do
     t.string "request_id", null: false
     t.float "gvl_wait_time", null: false
     t.float "processing_time", null: false
+    t.float "queue_time", null: false
     t.string "process_type", null: false
     t.integer "concurrency_level", null: false
-    t.float "queue_time", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
