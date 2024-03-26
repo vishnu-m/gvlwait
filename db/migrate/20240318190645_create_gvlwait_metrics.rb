@@ -6,6 +6,7 @@ class CreateGvlwaitMetrics < ActiveRecord::Migration[7.1]
       t.float :processing_time, null: false
       t.string :process_type, null: false
       t.integer :concurrency_level, null: false
+      t.float :queue_time, null: false
 
       t.timestamps
     end

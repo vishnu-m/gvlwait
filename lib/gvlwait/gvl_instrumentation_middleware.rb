@@ -2,6 +2,7 @@ require 'gvltools'
 require 'net/http'
 require 'uri'
 require 'concurrent'
+require 'gvlwait/request_metrics'
 
 module Gvlwait
   class GvlInstrumentationMiddleware
@@ -15,20 +16,21 @@ module Gvlwait
     end
 
     def call(env)
+      request_metrics = RequestMetrics.new(env)
       gvl_start_time = GVLTools::LocalTimer.monotonic_time
       request_start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond)
-
       response = @app.call(env)
 
       gvl_wait_time_ms = ((GVLTools::LocalTimer.monotonic_time - gvl_start_time) / 1_000_000.0).round(2)
       request_processing_time_ms = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond) - request_start_time
-      
+
       metric = {
         request_id: env["action_dispatch.request_id"],
         process_type: "web",
         gvl_wait_time: gvl_wait_time_ms,
         processing_time: request_processing_time_ms,
-        concurrency_level: puma_max_threads
+        concurrency_level: puma_max_threads,
+        queue_time: request_metrics.queue_time
       }
 
       @@metrics << metric
@@ -45,7 +47,7 @@ module Gvlwait
       def record_request_metrics
         metrics_to_send = @@metrics.dup
         @@metrics.clear
-        
+
         Gvlwait::RecordMetricsJob.perform_later(metrics_to_send)
       end
 
