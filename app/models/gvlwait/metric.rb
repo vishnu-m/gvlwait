@@ -10,5 +10,9 @@ module Gvlwait
     def self.average_processing_times_by_concurrency
       group(:concurrency_level).average(:processing_time)
     end
+
+    def self.average_request_queue_times_by_concurrency
+      group(:concurrency_level).average(:queue_time)
+    end
   end
 end

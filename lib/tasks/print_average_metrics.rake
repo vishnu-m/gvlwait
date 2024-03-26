@@ -3,6 +3,7 @@ namespace :gvlwait do
   task print_average_metrics: :environment do
     wait_time_averages = Gvlwait::Metric.average_gvl_wait_times_by_concurrency
     processing_time_averages = Gvlwait::Metric.average_processing_times_by_concurrency
+    request_queue_time_averages = Gvlwait::Metric.average_request_queue_times_by_concurrency
 
     header = "Concurrency Level | Average GVL Wait Time (ms)"
 
@@ -20,6 +21,15 @@ namespace :gvlwait do
 
     processing_time_averages.each do |concurrency_level, average_time|
       puts "#{concurrency_level} | #{average_time.round(2)}"
+    end
+
+    header = "Concurrency Level | Average Request Queue Time (ms)"
+
+    puts header
+    puts "-" * header.length
+
+    request_queue_time_averages.each do |concurrency_level, queue_time|
+      puts "#{concurrency_level} | #{queue_time.round(2)}"
     end
   end
 end
