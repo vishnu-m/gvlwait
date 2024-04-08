@@ -6,7 +6,7 @@ require 'gvlwait/request_metrics'
 
 module Gvlwait
   class GvlInstrumentationMiddleware
-    BATCH_SIZE = 100
+    BATCH_SIZE = 5
     @@metrics = Concurrent::Array.new
 
     def initialize(app)
