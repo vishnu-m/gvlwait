@@ -25,7 +25,7 @@ module Gvlwait
       request_processing_time_ms = Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_millisecond) - request_start_time
 
       metric = {
-        request_id: env["action_dispatch.request_id"],
+        request_id: env["HTTP_X_REQUEST_ID"],
         process_type: "web",
         gvl_wait_time: gvl_wait_time_ms,
         processing_time: request_processing_time_ms,
